@@ -2,6 +2,8 @@ package mate.academy.bookstore.repository.impl;
 
 import jakarta.persistence.EntityManagerFactory;
 import java.util.List;
+import java.util.Optional;
+import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.model.Book;
 import mate.academy.bookstore.repository.BookRepository;
 import org.hibernate.Session;
@@ -24,7 +26,6 @@ public class BookRepositoryImpl implements BookRepository {
     public Book save(Book book) {
         Session session = null;
         Transaction transaction = null;
-
         try {
             session = sessionFactory.openSession();
             transaction = session.beginTransaction();
@@ -49,7 +50,19 @@ public class BookRepositoryImpl implements BookRepository {
             Query<Book> fromBook = session.createQuery("FROM Book", Book.class);
             return fromBook.getResultList();
         } catch (Exception e) {
-            throw new RuntimeException("Can't get all books from DB", e);
+            throw new EntityNotFoundException("Can't get all books from DB", e);
+        }
+    }
+
+    @Override
+    public Optional<Book> findById(Long id) {
+        try (Session session = sessionFactory.openSession()) {
+            String hql = "FROM Book WHERE id = :id";
+            Query<Book> query = session.createQuery(hql, Book.class);
+            query.setParameter("id", id);
+            return query.uniqueResultOptional();
+        } catch (Exception e) {
+            throw new EntityNotFoundException("Can't find book with id: " + id, e);
         }
     }
 }
