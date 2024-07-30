@@ -1,44 +1,42 @@
 package mate.academy.bookstore.repository.impl;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import mate.academy.bookstore.exception.DataProcessingException;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.model.Book;
 import mate.academy.bookstore.repository.BookRepository;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.query.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@RequiredArgsConstructor
 public class BookRepositoryImpl implements BookRepository {
-    private final SessionFactory sessionFactory;
-
-    @Autowired
-    public BookRepositoryImpl(EntityManagerFactory entityManagerFactory) {
-        sessionFactory = entityManagerFactory.unwrap(SessionFactory.class);
-    }
+    private final EntityManagerFactory entityManagerFactory;
 
     @Override
     public Book save(Book book) {
-        Session session = null;
-        Transaction transaction = null;
+        EntityManager entityManager = null;
+        EntityTransaction transaction = null;
         try {
-            session = sessionFactory.openSession();
-            transaction = session.beginTransaction();
-            session.persist(book);
+            entityManager = entityManagerFactory
+                    .createEntityManager();
+            transaction = entityManager.getTransaction();
+            transaction.begin();
+            entityManager.persist(book);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException("Can't save book: " + book + " to the DB", e);
+            throw new DataProcessingException("Can't save book: " + book + " to the DB", e);
         } finally {
-            if (session != null) {
-                session.close();
+            if (entityManager != null) {
+                entityManager.close();
             }
         }
         return book;
@@ -46,8 +44,9 @@ public class BookRepositoryImpl implements BookRepository {
 
     @Override
     public List<Book> findAll() {
-        try (Session session = sessionFactory.openSession()) {
-            Query<Book> fromBook = session.createQuery("FROM Book", Book.class);
+        try (EntityManager entityManager = entityManagerFactory
+                .createEntityManager()) {
+            TypedQuery<Book> fromBook = entityManager.createQuery("FROM Book", Book.class);
             return fromBook.getResultList();
         } catch (Exception e) {
             throw new EntityNotFoundException("Can't get all books from DB", e);
@@ -56,11 +55,10 @@ public class BookRepositoryImpl implements BookRepository {
 
     @Override
     public Optional<Book> findById(Long id) {
-        try (Session session = sessionFactory.openSession()) {
-            String hql = "FROM Book WHERE id = :id";
-            Query<Book> query = session.createQuery(hql, Book.class);
-            query.setParameter("id", id);
-            return query.uniqueResultOptional();
+        try (EntityManager entityManager = entityManagerFactory
+                .createEntityManager()) {
+            Book book = entityManager.find(Book.class, id);
+            return Optional.ofNullable(book);
         } catch (Exception e) {
             throw new EntityNotFoundException("Can't find book with id: " + id, e);
         }
