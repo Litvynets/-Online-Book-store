@@ -1,7 +1,6 @@
 package mate.academy.bookstore.service.impl;
 
 import java.util.List;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import mate.academy.bookstore.dto.BookDto;
 import mate.academy.bookstore.dto.CreateBookRequestDto;
@@ -40,12 +39,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto update(Long id, CreateBookRequestDto createBookRequestDto) {
-        Optional<Book> bookById = bookRepository.findById(id);
-        if (bookById.isEmpty()) {
-            throw new EntityNotFoundException("Can't find book by id: " + id);
-        }
-        Book book = bookMapper.toModel(createBookRequestDto);
-        book.setId(id);
+        Book book = bookRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("Can't find book by id: " + id));
+        bookMapper.updateBookFromDto(createBookRequestDto, book);
         return bookMapper.toDto(bookRepository.save(book));
     }
 
