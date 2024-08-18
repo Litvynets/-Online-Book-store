@@ -1,5 +1,6 @@
 package mate.academy.bookstore.mapper;
 
+import java.util.List;
 import mate.academy.bookstore.config.MapperConfig;
 import mate.academy.bookstore.dto.BookDto;
 import mate.academy.bookstore.dto.CreateBookRequestDto;
@@ -14,4 +15,6 @@ public interface BookMapper {
     Book toModel(CreateBookRequestDto dto);
 
     void updateBookFromDto(CreateBookRequestDto dto, @MappingTarget Book book);
+
+    List<BookDto> toDtoList(List<Book> books);
 }
