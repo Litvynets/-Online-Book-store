@@ -1,6 +1,7 @@
 package mate.academy.bookstore.repository.book;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.model.Book;
 import mate.academy.bookstore.repository.SpecificationProvider;
@@ -14,8 +15,9 @@ public class BookSpecificationProviderManager implements SpecificationProviderMa
 
     @Override
     public SpecificationProvider<Book> getSpecificationProvider(String key) {
-        return bookSpecificationProviders.stream().filter(p -> p.getKey().equals(key)).findFirst()
-                .orElseThrow(() -> new RuntimeException("Can't find correct specification"
+        return bookSpecificationProviders.stream().filter(provider ->
+                        provider.getKey().equals(key)).findFirst()
+                .orElseThrow(() -> new NoSuchElementException("Can't find correct specification"
                         + " provider for key: " + key));
     }
 }
