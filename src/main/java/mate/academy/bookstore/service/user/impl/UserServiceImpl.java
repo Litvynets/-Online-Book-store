@@ -8,7 +8,6 @@ import mate.academy.bookstore.mapper.user.UserMapper;
 import mate.academy.bookstore.model.User;
 import mate.academy.bookstore.repository.user.UserRepository;
 import mate.academy.bookstore.service.user.UserService;
-import mate.academy.bookstore.util.HashUtil;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,8 +22,6 @@ public class UserServiceImpl implements UserService {
             throw new RegistrationException("Email already exists");
         }
         User user = userMapper.registrationDtoToModel(registrationDto);
-        user.setSalt(HashUtil.generateSalt());
-        user.setPassword(HashUtil.hashPassword(user.getPassword(), user.getSalt()));
         return userMapper.modelToResponseDto(userRepository.save(user));
     }
 }

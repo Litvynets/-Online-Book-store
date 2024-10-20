@@ -28,9 +28,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "200",
                     description = "The user is successfully registered"),
             @ApiResponse(responseCode = "400",
-                    description = "Invalid request body"),
-            @ApiResponse(responseCode = "401",
-                    description = "Registration failed")
+                    description = "Invalid request body")
     })
     public UserResponseDto register(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
         return userService.register(userRegistrationDto);

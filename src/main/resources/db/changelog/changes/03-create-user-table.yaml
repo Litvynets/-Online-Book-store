@@ -24,11 +24,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: salt
-                  type: TINYBLOB
-                  constraints:
-                    nullable: false
-              - column:
                   name: first_name
                   type: VARCHAR(255)
                   constraints:

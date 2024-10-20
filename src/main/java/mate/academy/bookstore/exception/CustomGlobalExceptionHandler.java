@@ -42,8 +42,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     @ExceptionHandler(RegistrationException.class)
     public ResponseEntity<Object> handleRegistrationException(
             RegistrationException ex) {
-        Map<String, Object> body = generateErrorBody(ex, HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+        Map<String, Object> body = generateErrorBody(ex, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     private String getErrorMessage(ObjectError error) {
