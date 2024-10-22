@@ -28,7 +28,9 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "200",
                     description = "The user is successfully registered"),
             @ApiResponse(responseCode = "400",
-                    description = "Invalid request body")
+                    description = "Invalid request body"),
+            @ApiResponse(responseCode = "409",
+                    description = "Conflict during user registration")
     })
     public UserResponseDto register(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
         return userService.register(userRegistrationDto);
