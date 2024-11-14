@@ -13,6 +13,7 @@ import mate.academy.bookstore.dto.book.CreateBookRequestDto;
 import mate.academy.bookstore.service.book.BookService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,12 +32,14 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Get all books", description = "Get a list of available books")
     public List<BookDto> getAll(Pageable pageable) {
         return bookService.findAll(pageable);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Get a book by ID", description = "Get an available book by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved"),
@@ -48,6 +51,7 @@ public class BookController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Create a new book", description = "Create a new book "
             + "and add it to the DB")
     @ApiResponses(value = {
@@ -59,6 +63,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Update a book by ID", description = "Update the book fields "
             + "and add changes to the DB")
     @ApiResponses(value = {
@@ -73,6 +78,7 @@ public class BookController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Delete a book by ID", description = "Delete the book with "
             + "the specified ID from the DB")
     @ApiResponse(responseCode = "204", description = "The book has been successfully deleted")
@@ -81,6 +87,7 @@ public class BookController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @Operation(summary = "Search a book", description = "Search the books using input parameters")
     public List<BookDto> searchBook(BookSearchParameters searchParameters, Pageable pageable) {
         return bookService.search(searchParameters, pageable);
