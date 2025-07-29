@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: add user to users table
+      author: Ivan Litvynets
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: admin@mate.com
+              - column:
+                  name: password
+                  value: $2a$10$ZS1ZB/9bXE0gTuBSWqqXrOK.IkwMJYU6VPYsCtQ3Is1cwSmXyaKLa
+              - column:
+                  name: first_name
+                  value: Admin
+              - column:
+                  name: last_name
+                  value: Admin
+
+  - changeSet:
+      id: add ROLE_ADMIN to user
+      author: Ivan Litvynets
+      changes:
+        - insert:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: "(SELECT id FROM users WHERE email = 'admin@mate.com')"
+              - column:
+                  name: role_id
+                  valueComputed: "(SELECT id FROM roles WHERE name = 'ROLE_ADMIN')"
