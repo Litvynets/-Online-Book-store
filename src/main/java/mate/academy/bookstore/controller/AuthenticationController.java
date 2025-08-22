@@ -6,8 +6,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mate.academy.bookstore.dto.user.UserLoginRequestDto;
+import mate.academy.bookstore.dto.user.UserLoginResponseDto;
 import mate.academy.bookstore.dto.user.UserRegistrationDto;
 import mate.academy.bookstore.dto.user.UserResponseDto;
+import mate.academy.bookstore.security.AuthenticationService;
 import mate.academy.bookstore.service.user.UserService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthenticationController {
     private final UserService userService;
+    private final AuthenticationService authenticationService;
 
     @PostMapping("/registration")
     @Operation(summary = "User registration",
@@ -34,5 +38,19 @@ public class AuthenticationController {
     })
     public UserResponseDto register(@RequestBody @Valid UserRegistrationDto userRegistrationDto) {
         return userService.register(userRegistrationDto);
+    }
+
+    @PostMapping("/login")
+    @Operation(summary = "User login",
+            description = "User authentication with email and password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "The user has successfully logged in and a token was returned"),
+            @ApiResponse(responseCode = "401",
+                    description = "Invalid request: incorrect email or password, "
+                            + "or request body")
+    })
+    public UserLoginResponseDto login(@RequestBody @Valid UserLoginRequestDto request) {
+        return authenticationService.authenticate(request);
     }
 }
