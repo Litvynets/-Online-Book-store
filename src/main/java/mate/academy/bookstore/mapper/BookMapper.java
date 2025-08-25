@@ -1,10 +1,14 @@
 package mate.academy.bookstore.mapper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import mate.academy.bookstore.config.MapperConfig;
 import mate.academy.bookstore.dto.book.BookDto;
+import mate.academy.bookstore.dto.book.BookDtoWithoutCategoryIds;
 import mate.academy.bookstore.dto.book.CreateBookRequestDto;
 import mate.academy.bookstore.model.Book;
+import mate.academy.bookstore.model.Category;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
@@ -12,9 +16,29 @@ import org.mapstruct.MappingTarget;
 public interface BookMapper {
     BookDto toDto(Book book);
 
-    Book toModel(CreateBookRequestDto dto);
+    Book toEntity(CreateBookRequestDto bookDto);
 
     void updateBookFromDto(CreateBookRequestDto dto, @MappingTarget Book book);
 
     List<BookDto> toDtoList(List<Book> books);
+
+    BookDtoWithoutCategoryIds toDtoWithoutCategories(Book book);
+
+    @AfterMapping
+    default void setCategoryIds(@MappingTarget BookDto bookDto, Book book) {
+        if (book.getCategories() != null) {
+            bookDto.setCategoryIds(
+                    book.getCategories().stream()
+                            .map(Category::getId)
+                            .collect(Collectors.toSet())
+            );
+        }
+    }
+
+    @AfterMapping
+    default void setCategories(CreateBookRequestDto bookDto,@MappingTarget Book book) {
+        book.setCategories(bookDto.getCategoryIds().stream()
+                .map(Category::ofId)
+                .collect(Collectors.toSet()));
+    }
 }
